@@ -1,5 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
 public class PlayerAction : MonoBehaviour {
@@ -68,6 +71,31 @@ public class PlayerAction : MonoBehaviour {
         } else {
             cash = cash - amount;
         }
+    }
+    public void SaveGame()
+    {
+        BinaryFormatter bf = new BinaryFormatter();
+        FileStream file = File.Open(Application.persistentDataPath + "gameInfo.dat", FileMode.Create);
+        Player playerDataToSave = new Player();
+        playerDataToSave.QteArgent = cash;
+        playerDataToSave.QtePetrole = oilNumber;
+        playerDataToSave.QteOr = goldNumber;
+        bf.Serialize(file, playerDataToSave);
+        file.Close();
+    }
+    public void LoadGame()
+    {
+        BinaryFormatter bf = new BinaryFormatter();
+        if (!File.Exists(Application.persistentDataPath + "gameInfo.dat"))
+        {
+            throw new Exception("Game file don't exist");
+        }
+        FileStream file = File.Open(Application.persistentDataPath + "gameInfo.dat", FileMode.Open);
+        Player playeDataToLoad = (Player)bf.Deserialize(file);
+        file.Close();
+        cash = playeDataToLoad.QteArgent;
+        oilNumber = playeDataToLoad.QtePetrole;
+        goldNumber = playeDataToLoad.QteOr;
     }
 
 
